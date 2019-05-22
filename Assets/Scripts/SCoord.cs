@@ -4,7 +4,7 @@ using System;
 /// <summary>
 /// Spherical Coordinate with a latitude and longitude around a sphere
 /// </summary>
-public class SCoord : MonoBehaviour
+public class SCoord
 {
     /// <summary>
     /// Coordinates in lattidue and longitude. Measured in radians.
@@ -20,6 +20,33 @@ public class SCoord : MonoBehaviour
     {
         this.lat = lat;
         this.lon = lon;
+    }
+
+    /// <summary>
+    /// Get the lattitude of the coordinate.
+    /// </summary>
+    /// <returns>Longitude of the point as a float.</returns>
+    public float GetLat()
+    {
+        return lat;
+    }
+
+    /// <summary>
+    /// Get the longitude of the coordinate.
+    /// </summary>
+    /// <returns>Lattitude of the point as a float.</returns>
+    public float GetLon()
+    {
+        return lon;
+    }
+
+    /// <summary>
+    /// Gets a string representation of the lattitude and longitude of an icosphere.
+    /// </summary>
+    /// <returns>String of the lattitude and longitude of the point</returns>
+    public override string ToString()
+    {
+        return "SCoord: lat=" + lat.ToString() + " lon=" + lon.ToString();
     }
 
     /// <summary>

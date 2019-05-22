@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// A graph is a collection of points and edges. This graph uses a 
@@ -100,4 +101,10 @@ public class Graph<T>
     {
         return graph[point];
     }
+
+    /// <summary>
+    /// Gets the set of points that this graph contains
+    /// </summary>
+    /// <returns>Enumerable object of points. </returns>
+    public IEnumerable<T> GetPoints() => graph.Keys;
 }
