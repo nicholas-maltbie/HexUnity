@@ -33,6 +33,39 @@ public class SCoord : MonoBehaviour
     }
 
     /// <summary>
+    /// Evaluates if two SCoordinates are equivalent. Two coordinate are equal if they have the 
+    /// same lattitude and longitude. 
+    /// </summary>
+    /// <param name="other">Other coordinate to compare to</param>
+    /// <returns>True if they are the same, false otherwise.</returns>
+    public override bool Equals(object other)
+    {
+        if (this.GetType().IsAssignableFrom(other.GetType()))
+        {
+            SCoord otherCoord = (SCoord)other;
+            return otherCoord.lat == lat && otherCoord.lon == lon;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Get the hash code of a SCoord. Generated using the lattitude and longitude of a point.
+    /// </summary>
+    /// <returns>Arbitrary hash value for a given point. </returns>
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 683;
+
+            hash += 59 * lat.GetHashCode();
+            hash += 683 * lon.GetHashCode();
+
+            return hash;
+        }
+    }
+
+    /// <summary>
     /// Convert a sphereical coordinate to a unit vector in the direction from the cetner of the sphere
     /// </summary>
     /// <param name="coord">Spherical cooridnate to use</param>
