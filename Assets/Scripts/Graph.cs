@@ -102,6 +102,16 @@ public class Graph<T>
         return graph[point];
     }
 
+    public override string ToString()
+    {
+        List<String> lines = new List<String>();
+        foreach (T key in graph.Keys)
+        {
+            lines.Add(key + " : " + String.Join(", ", GetConnected(key)));
+        }
+        return String.Join("\n", lines);
+    }
+
     /// <summary>
     /// Gets the set of points that this graph contains
     /// </summary>

@@ -56,6 +56,38 @@ public class Icosphere
     }
 
     /// <summary>
+    /// Gets the points adjacent to a given point.
+    /// </summary>
+    /// <param name="coordinate">Point in the graph</param>
+    /// <returns>The coordinate of that point.</returns>
+    public IEnumerable<SCoord> GetNeighbors(SCoord coordinate)
+    {
+        return vertices.GetConnected(coordinate);
+    }
+
+    /// <summary>
+    /// Check if two vertices are connected.
+    /// </summary>
+    /// <param name="coord1"></param>
+    /// <param name="coord2"></param>
+    /// <returns></returns>
+    public Boolean AreConnected(SCoord coord1, SCoord coord2)
+    {
+        return vertices.AreConnected(coord1, coord2);
+    }
+
+    /// <summary>
+    /// Gets the number of connected vertices to a given vertex.
+    /// </summary>
+    /// <param name="coordiante">A spherical coordinate on the icosphere that 
+    /// corresponds to a vertex on the sphere.</param>
+    /// <returns>The number of connected vertices to a given vertex.</returns>
+    public int GetDegree(SCoord coordiante)
+    {
+        return vertices.Degree(coordiante);
+    }
+
+    /// <summary>
     /// Gets the points that describe the rotation around the origin of a 12 point icosphere.
     /// </summary>
     /// <returns>A graph of the points in the icosphere and their connected edges.</returns>
