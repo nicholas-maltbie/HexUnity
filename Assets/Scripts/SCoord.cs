@@ -18,11 +18,6 @@ public class SCoord
     /// <param name="lon">longitude of the coordinate (in radians)</param>
     public SCoord(float lat, float lon)
     {
-        while (lat < 0) lat += Mathf.PI * 2;
-        while (lat > Math.PI * 2) lat -= Mathf.PI * 2;
-        while (lon < 0) lon += Mathf.PI * 2;
-        while (lon > Math.PI * 2) lon -= Mathf.PI * 2;
-
         this.lat = lat;
         this.lon = lon;
 
@@ -52,7 +47,8 @@ public class SCoord
     /// <returns>String of the lattitude and longitude of the point</returns>
     public override string ToString()
     {
-        return "SCoord lat=" + lat.ToString() + " lon=" + lon.ToString();
+        return "SCoord lat=" + (Mathf.Round(lat * 180 / Mathf.PI * 100) / 100).ToString() + 
+            " lon=" + (Mathf.Round(lon * 180 / Mathf.PI * 100) / 100).ToString().ToString();
     }
 
     /// <summary>
@@ -107,6 +103,30 @@ public class SCoord
     public static float GetAngleBetween(SCoord coord1, SCoord coord2)
     {
         return Mathf.Acos(Vector3.Dot(coord1.ToEuclidian(), coord2.ToEuclidian()));
+    }
+
+    /// <summary>
+    /// Gets the midpoint between two spherical coordinates. 
+    /// </summary>
+    /// <param name="coord1">First coordinate</param>
+    /// <param name="coord2">Second coordinate</param>
+    /// <returns>The point that lies between the two points along the great circle between them.</returns>
+    public static SCoord GetMidpoint(SCoord coord1, SCoord coord2)
+    {
+        float lat1 = coord1.lat;
+        float lon1 = coord1.lon;
+        float lat2 = coord2.lat;
+        float lon2 = coord2.lon;
+
+        float dLon = (lon2 - lon1 + Mathf.PI * 2) % (Mathf.PI * 2);
+
+
+        float Bx = Mathf.Cos(lat2) * Mathf.Cos(dLon);
+        float By = Mathf.Cos(lat2) * Mathf.Sin(dLon);
+        float lat3 = Mathf.Atan2(Mathf.Sin(lat1) + Mathf.Sin(lat2), Mathf.Sqrt((Mathf.Cos(lat1) + Bx) * (Mathf.Cos(lat1) + Bx) + By * By));
+        float lon3 = lon1 + Mathf.Atan2(By, Mathf.Cos(lat1) + Bx);
+
+        return new SCoord(lat3, lon3);
     }
 
     /// <summary>

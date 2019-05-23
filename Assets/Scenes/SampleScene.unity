@@ -210,10 +210,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76fa12c827158af45b8bf0b74f2837a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hexagonPrefab: {fileID: 100002, guid: b3d124357f26532489b2c397dff7e68d, type: 3}
+  hexagonPrefab: {fileID: 3489350760046280056, guid: b91437ffcaab2a04f8d79d969b530135,
+    type: 3}
   pentagonPrefab: {fileID: 6278801445140492901, guid: e3da1ebf67661244cb9293d67032bc24,
     type: 3}
-  radius: 1.25
+  radius: 4
+  subdivsions: 1
 --- !u!4 &997719124
 Transform:
   m_ObjectHideFlags: 0
