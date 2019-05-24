@@ -140,6 +140,13 @@ public class Icosphere
     }
 
     /// <summary>
+    /// Sets the radius of the icosphere.
+    /// </summary>
+    /// <param name="newRadius">Changes the radius of the sphere.</param>
+    public void SetRadius(float newRadius) => radius = newRadius;
+
+
+    /// <summary>
     /// Get the coordinates of an icosphere as spherical coordinates.
     /// </summary>
     /// <returns>An enumerable set of points in the spherical coordinates.</returns>

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Spherical Coordinate with a latitude and longitude around a sphere
@@ -148,5 +149,121 @@ public class SCoord
         return new Vector3(Mathf.Cos(coord.lat) * Mathf.Cos(coord.lon),
             Mathf.Sin(coord.lat),
             Mathf.Cos(coord.lat) * Mathf.Sin(coord.lon));
+    }
+
+    public static SCoord ConvertToSCoord(Vector3 vector)
+    {
+        if (vector.x == 0)
+            vector.x = Mathf.Epsilon;
+        float outLon = Mathf.Atan(vector.z / vector.x);
+        if (vector.x < 0)
+            outLon += Mathf.PI;
+        float outLat = Mathf.Asin(vector.y);
+
+        return new SCoord(outLat, outLon);
+    }
+
+    public static SCoord[] SortClockwiseOrder(SCoord s1, SCoord s2, SCoord s3)
+    {
+        Vector3 v1 = s1.ToEuclidian();
+        Vector3 v2 = s2.ToEuclidian();
+        Vector3 v3 = s3.ToEuclidian();
+
+        Vector3 centroid = (v1 + v2 + v3).normalized;
+        Vector3 n = Vector3.Cross(v2 - v1, v3 - v1);
+
+        float w = Vector3.Dot(n, v2 - centroid);
+
+        if (w > 0)
+        {
+            return new SCoord[] { s1, s2, s3 };
+        }
+        return new SCoord[] { s3, s2, s1 };
+    }
+}
+
+/// <summary>
+/// Compare two SCoordinates sorting by lattitude then longitude.
+/// </summary>
+public class SCoordComparatorLat : IComparer<SCoord>
+{
+    /// <summary>
+    /// Compares two coordinates. Uses lattitude before longitude. This is mostly
+    /// and arbitrary but consistant sorting method.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns>
+    /// 1 if x's lattitude is greater than y's
+    /// -1 if x's lattitude is less than y's
+    /// if x's lattitude and y's lattitude are equal
+    /// 1 if x's longitude is greater than y's longitude
+    /// -1 if y's longitude is less than y's longitude
+    /// 0 if x's longitude equals y's longitude
+    /// </returns>
+    public int Compare(SCoord x, SCoord y)
+    {
+        if (x.GetLat() > y.GetLat())
+        {
+            return 1;
+        }
+        if (x.GetLat() < y.GetLat())
+        {
+            return -1;
+        }
+
+        if (x.GetLon() > y.GetLon())
+        {
+            return 1;
+        }
+        if (x.GetLon() < y.GetLon())
+        {
+            return -1;
+        }
+
+        return 0;
+    }
+}
+
+/// <summary>
+/// Compare two SCoordinates sorting by longitude then lattitude.
+/// </summary>
+public class SCoordComparatorLon : IComparer<SCoord>
+{
+    /// <summary>
+    /// Compares two coordinates. Uses longitude before lattitude. This is mostly
+    /// and arbitrary but consistant sorting method.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns>
+    /// 1 if x's longitude is greater than y's
+    /// -1 if x's longitude is less than y's
+    /// if x's longitude and y's longitude are equal
+    /// 1 if x's lattitude is greater than y's lattitude
+    /// -1 if y's lattitude is less than y's lattitude
+    /// 0 if x's lattitude equals y's lattitude
+    /// </returns>
+    public int Compare(SCoord x, SCoord y)
+    {
+        if (x.GetLon() > y.GetLon())
+        {
+            return 1;
+        }
+        if (x.GetLon() < y.GetLon())
+        {
+            return -1;
+        }
+
+        if (x.GetLat() > y.GetLat())
+        {
+            return 1;
+        }
+        if (x.GetLat() < y.GetLat())
+        {
+            return -1;
+        }
+
+        return 0;
     }
 }
