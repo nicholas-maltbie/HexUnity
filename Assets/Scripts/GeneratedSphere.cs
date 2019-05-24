@@ -26,17 +26,6 @@ public class GeneratedSphere : MonoBehaviour
             // Get the 3d coordinate of the sphere
             Vector3 point = sphere.GetPoint(coord);
 
-            IEnumerator<SCoord> neighbors = sphere.GetNeighbors(coord).GetEnumerator();
-            neighbors.MoveNext();
-            SCoord neighbor = neighbors.Current;
-            do
-            {
-                neighbors.MoveNext();
-            }
-            while (!(new List<SCoord>(sphere.GetNeighbors(neighbors.Current)).Contains(neighbor)));
-            SCoord neighbor2 = neighbors.Current;
-            SCoord target = SCoord.GetMidpoint(neighbor, neighbor2);
-
 
             // Get the rotation of the face to make it tangent to the sphere
             Vector3 rotation = SCoord.GetRotation(coord);
@@ -54,16 +43,31 @@ public class GeneratedSphere : MonoBehaviour
             newObj.transform.position = point;
             newObj.transform.SetParent(this.transform);
 
-            // Save current position of the face's prime vertex
-            Vector3 currentPosition = Vector3.ProjectOnPlane(coord.ToEuclidian() - newObj.transform.right, newObj.transform.up.normalized);
-
-            // Project target vertex using one of the neighbors
-            Vector3 proj = Vector3.ProjectOnPlane(coord.ToEuclidian() - target.ToEuclidian(), newObj.transform.up.normalized);
-            float angle = angle = Vector3.Angle(currentPosition, proj);
 
             // Rotate the face to be line up correclty
-            newObj.transform.Rotate(0, angle, 0, Space.Self);
+            IEnumerator<SCoord> neighbors = sphere.GetNeighbors(coord).GetEnumerator();
+            neighbors.MoveNext();
+            SCoord neighbor = neighbors.Current;
 
+            Vector3 targetVec = Vector3.ProjectOnPlane(neighbor.ToEuclidian() - coord.ToEuclidian(), newObj.transform.up).normalized;
+
+            float angle = Mathf.Acos(Vector3.Dot(newObj.transform.right.normalized, targetVec));
+            if (float.IsNaN(angle))
+            {
+                angle = 180;
+            }
+            Vector3 cross = Vector3.Cross(newObj.transform.right.normalized, targetVec);
+            
+            if (Vector3.Dot(newObj.transform.up.normalized, cross) < 0)
+            {
+                angle *= -1;
+            }
+
+            angle *= 180 / Mathf.PI;
+
+            Debug.Log(angle);
+
+            newObj.transform.Rotate(0, angle, 0, Space.Self);
             tiles.Add(coord, newObj);
         }
     }
@@ -76,28 +80,17 @@ public class GeneratedSphere : MonoBehaviour
             IEnumerator<SCoord> neighbors = sphere.GetNeighbors(coord).GetEnumerator();
             neighbors.MoveNext();
             SCoord neighbor = neighbors.Current;
-            do
-            {
-                neighbors.MoveNext();
-            }
-            while (!(new List<SCoord>(sphere.GetNeighbors(neighbors.Current)).Contains(neighbor)));
-            SCoord neighbor2 = neighbors.Current;
-            SCoord target = SCoord.GetMidpoint(neighbor, neighbor2);
 
-            // Save current position of the face's prime vertex
-            Vector3 currentPosition = Vector3.ProjectOnPlane(coord.ToEuclidian() - tiles[coord].transform.right, tiles[coord].transform.up.normalized);
+            Vector3 targetVec = Vector3.ProjectOnPlane(neighbor.ToEuclidian() - coord.ToEuclidian(), tiles[coord].transform.up).normalized;
 
-            // Project target vertex using one of the neighbors
-            Vector3 proj = Vector3.ProjectOnPlane(coord.ToEuclidian() - target.ToEuclidian(), tiles[coord].transform.up.normalized);
-            float angle = angle = Vector3.Angle(currentPosition, proj);
-            Debug.DrawRay(sphere.GetPoint(coord), proj, Color.green);
-            Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.up, Color.yellow);
-            Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.right, Color.red);
+            Debug.DrawRay(sphere.GetPoint(coord), targetVec, Color.green);
+            Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.up.normalized, Color.yellow);
+            Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.right.normalized, Color.red);
 
-            foreach (SCoord other in sphere.GetNeighbors(coord))
+            /*foreach (SCoord other in sphere.GetNeighbors(coord))
             {
                 Debug.DrawLine(sphere.GetPoint(coord), sphere.GetPoint(other), Color.blue);
-            }
+            }*/
         }
     }
 }

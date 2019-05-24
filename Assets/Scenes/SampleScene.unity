@@ -214,8 +214,8 @@ MonoBehaviour:
     type: 3}
   pentagonPrefab: {fileID: 6278801445140492901, guid: e3da1ebf67661244cb9293d67032bc24,
     type: 3}
-  radius: 4
-  subdivsions: 1
+  radius: 3
+  subdivsions: 0
 --- !u!4 &997719124
 Transform:
   m_ObjectHideFlags: 0
