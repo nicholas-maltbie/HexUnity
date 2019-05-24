@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   edgeLength: 1
-  subdivsions: 2
+  subdivsions: 5
 --- !u!4 &997719124
 Transform:
   m_ObjectHideFlags: 0
