@@ -14,6 +14,7 @@ public class IcosphereMesh : MonoBehaviour
     private Icosphere sphere;
     private Vector3[] vertices;
     private List<SCoord> coordinates;
+    private Dictionary<SCoord, int> keyLookup;
     private int[] triangles;
 
     // Start is called before the first frame update
@@ -36,11 +37,11 @@ public class IcosphereMesh : MonoBehaviour
 
         // Compute the scaling factor to meet the target edge length
         // Get the distance from the pole to one of its neighbors
-        Vector3 v1 = sphere.GetPoint(coordinates[0]);
+        Vector3 scaleVec1 = sphere.GetPoint(coordinates[0]);
         IEnumerator<SCoord> scaleNeighbors = sphere.GetNeighbors(coordinates[0]).GetEnumerator();
         scaleNeighbors.MoveNext();
-        Vector3 v2 = sphere.GetPoint(scaleNeighbors.Current);
-        float dist = Vector3.Distance(v1, v2);
+        Vector3 scaleVec2 = sphere.GetPoint(scaleNeighbors.Current);
+        float dist = Vector3.Distance(scaleVec1, scaleVec2);
 
         // Compute the new scale factor and set this for the sphere
         float sf = edgeLength / dist;
@@ -51,7 +52,7 @@ public class IcosphereMesh : MonoBehaviour
         // Saved list of normals for each vertex
         Vector3[] normals = new Vector3[coordinates.Count];
         // Save reverselookup of SCoord to index in array of vertices
-        Dictionary<SCoord, int> keyLookup = new Dictionary<SCoord, int>();
+        keyLookup = new Dictionary<SCoord, int>();
         // For each vetex, compute the 3d position, normal and save in lookup table
         for (int i = 0; i < coordinates.Count; i++)
         {
@@ -127,6 +128,7 @@ public class IcosphereMesh : MonoBehaviour
         mesh.vertices = vertices;
         mesh.normals = normals;
         triangles = triangleList.ToArray();
+
     }
 
 

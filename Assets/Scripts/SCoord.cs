@@ -151,6 +151,11 @@ public class SCoord
             Mathf.Cos(coord.lat) * Mathf.Sin(coord.lon));
     }
 
+    /// <summary>
+    /// Converts a 3d coordinate to an SCoord with the origin (0,0,0) as the center of the sphere
+    /// </summary>
+    /// <param name="vector"></param>
+    /// <returns></returns>
     public static SCoord ConvertToSCoord(Vector3 vector)
     {
         if (vector.x == 0)
@@ -163,6 +168,13 @@ public class SCoord
         return new SCoord(outLat, outLon);
     }
 
+    /// <summary>
+    ///  Sorts a set of three spherical coordinates in clockwise order
+    /// </summary>
+    /// <param name="s1"></param>
+    /// <param name="s2"></param>
+    /// <param name="s3"></param>
+    /// <returns>The ordered arary of vertices in clockwise order</returns>
     public static SCoord[] SortClockwiseOrder(SCoord s1, SCoord s2, SCoord s3)
     {
         Vector3 v1 = s1.ToEuclidian();
