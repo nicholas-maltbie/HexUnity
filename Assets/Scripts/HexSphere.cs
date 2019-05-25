@@ -21,7 +21,7 @@ public class HexSphere
         hexSphere.SetRadius(sf);
     }
 
-    public void RenderSphere(Transform parentObject)
+    public void RenderSphere(Transform parentObject, Texture outlineHex, Texture outlinePent)
     {
         foreach(SCoord tile in hexSphere.Coordinates)
         {
@@ -38,6 +38,11 @@ public class HexSphere
             newTile.transform.SetParent(parentObject);
 
             tileMap[tile] = newTile;
+
+            if (hexSphere.GetDegree(tile) == 5)
+                mr.material.SetTexture("_MainTex", outlinePent);
+            else if (hexSphere.GetDegree(tile) == 6)
+                mr.material.SetTexture("_MainTex", outlineHex);
         }
     }
 
@@ -66,20 +71,29 @@ public class HexSphere
 
         // Make list of vertices
         List<Vector3> vertices = new List<Vector3>(neighbors.Count + 1);
+        // Make list of normals for each vertex
         List<Vector3> normals = new List<Vector3>(neighbors.Count + 1);
+        // Make list of UV coordinates for each vertex
+        List<Vector2> uvLocations = new List<Vector2>(neighbors.Count + 1);
+
         Dictionary<SCoord, int> keyLookup = new Dictionary<SCoord, int>();
 
         keyLookup.Add(tileCenter, keyLookup.Count);
+        uvLocations.Add(new Vector2(0.5f, 0.5f));
         vertices.Add(hexSphere.GetPoint(tileCenter));
         normals.Add(tileCenter.ToEuclidian());
+
+        float radPerVertex = Mathf.PI * 2 / neighbors.Count;
 
         SCoord startVertex = neighbors.First.Value;
         SCoord source = startVertex;
         neighbors.RemoveFirst();
-        SCoord vert;
 
-        SCoord[] triangleCoords;
+        // Get the order of neighbors (forward or backward just wrapping around center)
+        LinkedList<SCoord> orderedNeighbors = new LinkedList<SCoord>();
+        orderedNeighbors.AddLast(startVertex);
 
+        // Calculate the teselated edges of the hexagon/pentagon
         while (neighbors.Count > 1)
         {
             // Find the next SCoord in the sequence of neighbors (neighbor to origin that is 
@@ -87,86 +101,53 @@ public class HexSphere
             LinkedListNode<SCoord> nextVertex = neighbors.First;
             while (!new List<SCoord>(hexSphere.GetNeighbors(nextVertex.Value)).Contains(source))
                 nextVertex = nextVertex.Next;
-
-            // Sort vertices in clockwise order
-            vert = SCoord.GetCentroid(tileCenter, nextVertex.Value, source);
-
-            keyLookup.Add(source, keyLookup.Count);
-            vertices.Add(hexSphere.GetPoint(vert));
-            normals.Add(vert.ToEuclidian());
+            orderedNeighbors.AddLast(nextVertex.Value);
 
             // Save current vertex as previous vertex
             source = nextVertex.Value;
             // Remove current vertex so it is not checked again
             neighbors.Remove(nextVertex);
         }
+        // Finish list of ordered neighbors
+        orderedNeighbors.AddLast(neighbors.First.Value);
 
-        vert = SCoord.GetCentroid(tileCenter, neighbors.First.Value, source);
-        keyLookup.Add(source, keyLookup.Count);
-        vertices.Add(hexSphere.GetPoint(vert));
-        normals.Add(vert.ToEuclidian());
+        foreach (SCoord n in orderedNeighbors)
+            keyLookup.Add(n, keyLookup.Count);
 
-        vert = SCoord.GetCentroid(tileCenter, neighbors.First.Value, startVertex);
-        keyLookup.Add(neighbors.First.Value, keyLookup.Count);
-        vertices.Add(hexSphere.GetPoint(vert));
-        normals.Add(vert.ToEuclidian());
-
-
-        // hexes are not triangles
-        neighbors = new LinkedList<SCoord>(hexSphere.GetNeighbors(tileCenter));
-
-        // Start drawing triangles between the coordinate and the coordinate's neighbors
+        List<SCoord> neighborList = new List<SCoord>(orderedNeighbors);
         List<int> triangleList = new List<int>();
 
-        startVertex = neighbors.First.Value;
-        source = startVertex;
-        neighbors.RemoveFirst();
-
-        // For each neighbor after the first, join them in a triangle-fan like fashion
-        while (neighbors.Count > 1)
+        for (int idx = 0; idx < neighborList.Count; idx++)
         {
-            // Find the next SCoord in the sequence of neighbors (neighbor to origin that is 
-            // adjacent to the previous neighbor)
-            LinkedListNode<SCoord> nextVertex = neighbors.First;
-            while (!new List<SCoord>(hexSphere.GetNeighbors(nextVertex.Value)).Contains(source))
-                nextVertex = nextVertex.Next;
+            // Get the centroid of the three adjacent tiles
+            SCoord vert = SCoord.GetCentroid(tileCenter, neighborList[idx], neighborList[(idx + 1) % neighborList.Count]);
 
-            // Sort vertices in clockwise order
-            triangleCoords = SCoord.SortClockwiseOrder(tileCenter, nextVertex.Value, source);
+            SCoord[] triangleCoords = SCoord.SortClockwiseOrder(tileCenter, 
+                neighborList[idx], 
+                neighborList[(idx + 1) % neighborList.Count]);
+
+            vertices.Add(hexSphere.GetPoint(vert));
+            normals.Add(vert.ToEuclidian());
+            Vector2 uv = new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f);
+            uvLocations.Add(new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f));
 
             triangleList.Add(keyLookup[triangleCoords[2]]);
             triangleList.Add(keyLookup[triangleCoords[1]]);
             triangleList.Add(keyLookup[triangleCoords[0]]);
-
-            // Save current vertex as previous vertex
-            source = nextVertex.Value;
-            // Remove current vertex so it is not checked again
-            neighbors.Remove(nextVertex);
         }
 
-        // Connext last vertex in sequence to previous vertex
+        // Flatten out the center of the hex so it doesn't arch out
+        Vector3 flatCenter = Vector3.zero;
+        for (int i = 1; i < vertices.Count; i++)
+            flatCenter += vertices[i];
+        flatCenter /= (vertices.Count - 1);
+        vertices[0] = flatCenter;
 
-        // Sort vertices in clockwise order
-        triangleCoords = SCoord.SortClockwiseOrder(tileCenter, neighbors.First.Value, source);
-
-        triangleList.Add(keyLookup[triangleCoords[2]]);
-        triangleList.Add(keyLookup[triangleCoords[1]]);
-        triangleList.Add(keyLookup[triangleCoords[0]]);
-
-
-        // Connext last vertex to first vertex
-
-        // Sort vertices in clockwise order
-        triangleCoords = SCoord.SortClockwiseOrder(tileCenter, neighbors.First.Value, startVertex);
-
-        triangleList.Add(keyLookup[triangleCoords[2]]);
-        triangleList.Add(keyLookup[triangleCoords[1]]);
-        triangleList.Add(keyLookup[triangleCoords[0]]);
-
-
+        // assign values to mesh
         mesh.vertices = vertices.ToArray();
         mesh.normals = normals.ToArray();
         mesh.triangles = triangleList.ToArray();
+        mesh.uv = uvLocations.ToArray();
     }
 }
 
