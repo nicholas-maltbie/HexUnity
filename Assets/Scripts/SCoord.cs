@@ -130,6 +130,14 @@ public class SCoord
         return new SCoord(lat3, lon3);
     }
 
+    public static SCoord GetCentroid(params SCoord[] coords)
+    {
+        Vector3 center = Vector3.zero;
+        foreach (SCoord coord in coords)
+            center += coord.ToEuclidian();
+        return SCoord.ConvertToSCoord(center.normalized);
+    }
+
     /// <summary>
     /// Gets the rotation of an object that would be on the surface of the sphere at this coordinate.
     /// </summary>
@@ -191,6 +199,20 @@ public class SCoord
             return new SCoord[] { s1, s2, s3 };
         }
         return new SCoord[] { s3, s2, s1 };
+    }
+
+    /// <summary>
+    ///  Sorts a set of three spherical coordinates in anticlockwise order
+    /// </summary>
+    /// <param name="s1"></param>
+    /// <param name="s2"></param>
+    /// <param name="s3"></param>
+    /// <returns>The ordered arary of vertices in anti clockwise order</returns>
+    public static SCoord[] SortAntiClockwiseOrder(SCoord s1, SCoord s2, SCoord s3)
+    {
+        List<SCoord> coords = new List<SCoord>(SortClockwiseOrder(s1, s2, s3));
+        coords.Reverse();
+        return coords.ToArray();
     }
 }
 
