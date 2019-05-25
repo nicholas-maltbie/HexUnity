@@ -60,3 +60,5 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+/Assets/Scripts/Face.cs
+/Assets/Scripts/Face.cs.meta

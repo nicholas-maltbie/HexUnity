@@ -132,9 +132,6 @@ public class Icosphere
             foreach (Edge<SCoord> connected in commonEdges)
                 subdivided.Connect(cut, cutLookup[connected]);
         }
-        
-        Debug.Log(vertices);
-        Debug.Log(subdivided);
 
         return new Icosphere(center, radius, subdivided);
     }
