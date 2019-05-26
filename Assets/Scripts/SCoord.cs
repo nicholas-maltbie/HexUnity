@@ -101,9 +101,40 @@ public class SCoord
     /// <param name="coord1">First coordinate on the sphere. (From)</param>
     /// <param name="coord2">Second coordinate on the sphere. (To)</param>
     /// <returns>The angle representing the direction between the two coordinates in radians.</returns>
-    public static float GetAngleBetween(SCoord coord1, SCoord coord2)
+    public static float GetAngleBetween(SCoord coord1, SCoord coord2) => Mathf.Acos(Vector3.Dot(coord1.ToEuclidian(), coord2.ToEuclidian()));
+
+    public static float GetBearing(SCoord coord1, SCoord coord2)
     {
-        return Mathf.Acos(Vector3.Dot(coord1.ToEuclidian(), coord2.ToEuclidian()));
+        float y = Mathf.Sin(coord2.lon - coord1.lon) * Mathf.Cos(coord2.lat);
+        float x = Mathf.Cos(coord1.lat) * Mathf.Sin(coord2.lat) -
+                Mathf.Sin(coord1.lat) * Mathf.Cos(coord2.lat) * Mathf.Cos(coord2.lon - coord1.lon);
+        return Mathf.Atan2(y, x);
+    }
+
+    public static SCoord GetPointAlongBearing(SCoord start, float bearing, float angularDistance, float radius)
+    {
+        float lat2 = Mathf.Asin(Mathf.Sin(start.lat) * Mathf.Cos(angularDistance / radius) +
+                    Mathf.Cos(start.lat) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(bearing));
+        float lon2 = start.lon + Mathf.Atan2(Mathf.Sin(bearing) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(start.lat),
+                                 Mathf.Cos(angularDistance / radius) - Mathf.Sin(start.lat) * Mathf.Sin(lat2));
+        return new SCoord(lat2, lon2);
+    }
+
+    public static SCoord GetIntermediatePoint(SCoord coord1, SCoord coord2, float fraction)
+    {
+        return GetIntermediatePoint(coord1, coord2, fraction, GetAngleBetween(coord1, coord2));
+    }
+
+    public static SCoord GetIntermediatePoint(SCoord coord1, SCoord coord2, float fraction, float delta)
+    {
+        float a = Mathf.Sin((1 - fraction) * delta) / Mathf.Sin(delta);
+        float b = Mathf.Sin(fraction * delta) / Mathf.Sin(delta);
+
+        float x = a * Mathf.Cos(coord1.GetLat()) * Mathf.Cos(coord1.GetLon()) + b * Mathf.Cos(coord2.GetLat()) * Mathf.Cos(coord2.GetLon());
+        float y = a * Mathf.Cos(coord1.GetLat()) * Mathf.Sin(coord1.GetLon()) + b * Mathf.Cos(coord2.GetLat()) * Mathf.Sin(coord2.GetLon());
+        float z = a * Mathf.Sin(coord1.GetLat()) + b * Mathf.Sin(coord2.GetLat());
+
+        return new SCoord(Mathf.Atan2(z, Mathf.Sqrt(x * x + y * y)), Mathf.Atan2(y, x));
     }
 
     /// <summary>
@@ -130,6 +161,11 @@ public class SCoord
         return new SCoord(lat3, lon3);
     }
 
+    /// <summary>
+    /// Gets the median point of a set of spherical coordinates
+    /// </summary>
+    /// <param name="coords"></param>
+    /// <returns></returns>
     public static SCoord GetCentroid(params SCoord[] coords)
     {
         Vector3 center = Vector3.zero;

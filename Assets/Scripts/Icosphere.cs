@@ -142,6 +142,10 @@ public class Icosphere
     /// <param name="newRadius">Changes the radius of the sphere.</param>
     public void SetRadius(float newRadius) => radius = newRadius;
 
+    /// <summary>
+    /// Gets the radius for the icosphere.
+    /// </summary>
+    public float Radius => radius;
 
     /// <summary>
     /// Get the coordinates of an icosphere as spherical coordinates.
@@ -195,10 +199,10 @@ public class Icosphere
         // Values for calculating rotation
         // lat difference for lattitude for the 10 alternating points in radians
         //  value is arctan(1/2)
-        float latDifference = 0.4636476f;
+        float latDifference = Mathf.Atan(0.5f);
         // lon difference for longitudinal distance between each point. They are equally 
         //   spaced with 10 points so each point is PI/5 radians apart
-        float lonDifference = 0.6283185f;
+        float lonDifference = Mathf.PI / 5;
 
         // points on top and bottom, alternating upper and lower sector
         for (int point = 0; point < 10; point++)

@@ -9,7 +9,6 @@ public class GameSphere : MonoBehaviour
     public Texture hexagonOutline, pentagonOutline;
     public float edgeLength;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -22,5 +21,10 @@ public class GameSphere : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public HexSphere GetSphere()
+    {
+        return hexSphere;
     }
 }

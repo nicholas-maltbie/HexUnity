@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HexSphere
 {
-    Icosphere hexSphere;
+    private Icosphere hexSphere;
     private Dictionary<SCoord, GameObject> tileMap;
 
 	public HexSphere(int subdivisions, Vector3 center, float edgeLength)
@@ -19,6 +19,11 @@ public class HexSphere
         // Scale the spehres
         float sf = HexSphere.GetScaleFactor(hexSphere, edgeLength);
         hexSphere.SetRadius(sf);
+    }
+
+    public Icosphere GetHexMap()
+    {
+        return hexSphere;
     }
 
     public void RenderSphere(Transform parentObject, Texture outlineHex, Texture outlinePent)
