@@ -6,7 +6,7 @@ public class GameSphere : MonoBehaviour
 {
     private HexSphere hexSphere;
     public int subdivisions;
-    public Texture hexagonOutline, pentagonOutline;
+    public Material hexagonOutline, pentagonOutline;
     public float edgeLength;
 
     // Start is called before the first frame update
@@ -15,6 +15,7 @@ public class GameSphere : MonoBehaviour
         hexSphere = new HexSphere(subdivisions, transform.position, edgeLength);
 
         hexSphere.RenderSphere(transform, hexagonOutline, pentagonOutline);
+        CameraHider.sphere = hexSphere;
     }
 
     // Update is called once per frame

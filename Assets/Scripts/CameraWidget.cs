@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class CameraWidget : MonoBehaviour
 {
+    int sphereLayer;
+
     public GameSphere sphere;
-    public Camera camera;
+    public Camera viewCamera;
     private Icosphere hexMap;
 
-    private float moveSpeed = 3.0f, rollSpeed = 20.0f, scrollSpeed = 20.0f;
+    private float moveSpeed = 3.0f, rollSpeed = 30.0f, scrollSpeed = 40.0f;
 
     private SCoord position = new SCoord(0, 0);
     private float height = 5.0f, minHeight = 3.0f, maxHeight = 8.0f;
@@ -16,6 +18,7 @@ public class CameraWidget : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        sphereLayer = LayerMask.NameToLayer("Sphere");
         transform.position = sphere.transform.position;
         transform.rotation = sphere.transform.rotation;
         transform.SetParent(sphere.transform);
@@ -40,6 +43,6 @@ public class CameraWidget : MonoBehaviour
         height = Mathf.Max(minHeight, Mathf.Min(height + zoomChange, maxHeight));
 
         transform.Rotate(rotateX, rotateY, rotateZ);
-        camera.transform.localPosition = new Vector3(0, sphere.GetSphere().GetHexMap().Radius + height, 0);
+        viewCamera.transform.localPosition = new Vector3(0, sphere.GetSphere().GetHexMap().Radius + height, 0);
     }
 }

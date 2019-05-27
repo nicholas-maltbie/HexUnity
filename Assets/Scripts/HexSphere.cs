@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class HexSphere
@@ -21,18 +22,28 @@ public class HexSphere
         hexSphere.SetRadius(sf);
     }
 
+    public GameObject GetTile(SCoord coordinate)
+    {
+        return tileMap[coordinate];
+    }
+
     public Icosphere GetHexMap()
     {
         return hexSphere;
     }
 
-    public void RenderSphere(Transform parentObject, Texture outlineHex, Texture outlinePent)
+    public void RenderSphere(Transform parentObject, Material outlineHex, Material outlinePent)
     {
-        foreach(SCoord tile in hexSphere.Coordinates)
+        int sphereLayer = LayerMask.NameToLayer("Sphere"); ;
+
+        foreach (SCoord tile in hexSphere.Coordinates)
         {
             GameObject newTile = new GameObject();
             MeshFilter mf = newTile.AddComponent<MeshFilter>();
             MeshRenderer mr = newTile.AddComponent<MeshRenderer>();
+            MeshCollider mc = newTile.AddComponent<MeshCollider>();
+            HexIdentifier hider = newTile.AddComponent<HexIdentifier>();
+            //GameObjectUtility.SetStaticEditorFlags(newTile, StaticEditorFlags.OccludeeStatic | StaticEditorFlags.OccluderStatic);
             mr.material = new Material(Shader.Find("Standard"));
 
             RenderTile(mf.mesh, tile);
@@ -44,10 +55,19 @@ public class HexSphere
 
             tileMap[tile] = newTile;
 
+            hider.center = hexSphere.GetPoint(tile);
+            hider.location = tile;
+
+            CameraHider.AddObject(hider);
+
+            newTile.layer = sphereLayer;
+
             if (hexSphere.GetDegree(tile) == 5)
-                mr.material.SetTexture("_MainTex", outlinePent);
+                mr.material = outlinePent;
             else if (hexSphere.GetDegree(tile) == 6)
-                mr.material.SetTexture("_MainTex", outlineHex);
+                mr.material = outlineHex;
+
+            mc.sharedMesh = mf.mesh;
         }
     }
 
