@@ -44,13 +44,14 @@ public class HexSphere
             MeshRenderer mr = newTile.AddComponent<MeshRenderer>();
             MeshCollider mc = newTile.AddComponent<MeshCollider>();
             HexIdentifier hider = newTile.AddComponent<HexIdentifier>();
-            //GameObjectUtility.SetStaticEditorFlags(newTile, StaticEditorFlags.OccludeeStatic | StaticEditorFlags.OccluderStatic);
+            //GameObjectUtility.SetStaticEditorFlags(newTile, 
+            //StaticEditorFlags.OccludeeStatic | StaticEditorFlags.OccluderStatic);
 
             // Set the standard material shader
-            mr.material = new Material(Shader.Find("Standard"));
+            mr.material = new Material(Shader.Find("Diffuse"));
 
             // Make the mesh and render the tile
-            RenderTile(mf.mesh, tile);
+            RenderTile(mf.mesh, tile, hexSphere);
 
             // Move the tile to its new position and rotation
             newTile.transform.position += parentObject.transform.position;
@@ -60,7 +61,8 @@ public class HexSphere
             newTile.transform.SetParent(parentObject);
 
             // Set Name of the tile
-            newTile.name = "Lat " + Mathf.Round(tile.GetTheta() * Mathf.Rad2Deg * 100) / 100 + " Lon " + Mathf.Round(tile.GetPhi() * Mathf.Rad2Deg * 100) / 100;
+            newTile.name = "Lat " + Mathf.Round(tile.GetTheta() * Mathf.Rad2Deg * 100) / 100 +
+                " Lon " + Mathf.Round(tile.GetPhi() * Mathf.Rad2Deg * 100) / 100;
 
             tileMap[tile] = newTile;
 
@@ -96,7 +98,7 @@ public class HexSphere
         return sf;
     }
 
-    private void RenderTile(Mesh mesh, SCoord tileCenter)
+    public static void RenderTile(Mesh mesh, SCoord tileCenter, Icosphere hexSphere)
     {
         // Make a linked list of the coordinate's neighbors
         LinkedList<SCoord> neighbors;
@@ -167,8 +169,10 @@ public class HexSphere
             // Add the normal vector of the vertex
             normals.Add(vert.ToEuclidian());
             // Add UV coordinate for this vertex
-            Vector2 uv = new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f);
-            uvLocations.Add(new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f));
+            Vector2 uv = new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 
+                0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f);
+            uvLocations.Add(new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 
+                0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f));
 
             // Add the triangles (set of three vertices)
             triangleList.Add(keyLookup[triangleCoords[2]]);
