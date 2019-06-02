@@ -75,7 +75,7 @@ public class GeneratedSphere : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach (SCoord coord in sphere.Coordinates)
+        /*foreach (SCoord coord in sphere.Coordinates)
         {
             IEnumerator<SCoord> neighbors = sphere.GetNeighbors(coord).GetEnumerator();
             neighbors.MoveNext();
@@ -87,10 +87,10 @@ public class GeneratedSphere : MonoBehaviour
             Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.up.normalized, Color.yellow);
             Debug.DrawRay(sphere.GetPoint(coord), tiles[coord].transform.right.normalized, Color.red);
 
-            /*foreach (SCoord other in sphere.GetNeighbors(coord))
+            foreach (SCoord other in sphere.GetNeighbors(coord))
             {
                 Debug.DrawLine(sphere.GetPoint(coord), sphere.GetPoint(other), Color.blue);
-            }*/
-        }
+            }
+        }*/
     }
 }

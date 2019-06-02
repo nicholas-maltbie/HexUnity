@@ -89,7 +89,7 @@ public class Icosphere
             // Get the endpoints of the edge
             SCoord[] endpts = edge.GetPoints();
             // Get the midpoint between the edge
-            SCoord midpoint = SCoord.GetMidpoint(endpts[0], endpts[1]);
+            SCoord midpoint = SCoord.GetCentroid(endpts[0], endpts[1]);
 
             cutLookup.Add(edge, midpoint);
 
