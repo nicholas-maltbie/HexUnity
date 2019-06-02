@@ -79,8 +79,6 @@ public class CameraWidget : MonoBehaviour
             float angularSize = (1 / distanceToScene) * Mathf.Rad2Deg;
             float pixelSize = ((angularSize * Screen.height) / Camera.main.fieldOfView);
 
-            Debug.Log(mouseX + " " + mouseY + " " + pixelSize);
-
             // Get the movement of the mouse
             Vector2 mouseRotateVector = new Vector2(-mouseY, mouseX) / pixelSize;
 

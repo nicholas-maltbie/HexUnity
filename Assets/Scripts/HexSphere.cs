@@ -38,20 +38,29 @@ public class HexSphere
 
         foreach (SCoord tile in hexSphere.Coordinates)
         {
+            // Setup new game object with generated mesh
             GameObject newTile = new GameObject();
             MeshFilter mf = newTile.AddComponent<MeshFilter>();
             MeshRenderer mr = newTile.AddComponent<MeshRenderer>();
             MeshCollider mc = newTile.AddComponent<MeshCollider>();
             HexIdentifier hider = newTile.AddComponent<HexIdentifier>();
             //GameObjectUtility.SetStaticEditorFlags(newTile, StaticEditorFlags.OccludeeStatic | StaticEditorFlags.OccluderStatic);
+
+            // Set the standard material shader
             mr.material = new Material(Shader.Find("Standard"));
 
+            // Make the mesh and render the tile
             RenderTile(mf.mesh, tile);
 
+            // Move the tile to its new position and rotation
             newTile.transform.position += parentObject.transform.position;
-            newTile.transform.Rotate(parentObject.transform.eulerAngles);
+            newTile.transform.Rotate(parentObject.transform.eulerAngles + parentObject.transform.eulerAngles);
 
+            // set hierarchy relationship
             newTile.transform.SetParent(parentObject);
+
+            // Set Name of the tile
+            newTile.name = "Lat " + Mathf.Round(tile.GetTheta() * Mathf.Rad2Deg * 100) / 100 + " Lon " + Mathf.Round(tile.GetPhi() * Mathf.Rad2Deg * 100) / 100;
 
             tileMap[tile] = newTile;
 
@@ -101,6 +110,7 @@ public class HexSphere
         // Make list of UV coordinates for each vertex
         List<Vector2> uvLocations = new List<Vector2>(neighbors.Count + 1);
 
+        // Setup lookup table for vertices
         Dictionary<SCoord, int> keyLookup = new Dictionary<SCoord, int>();
 
         keyLookup.Add(tileCenter, keyLookup.Count);
@@ -147,15 +157,20 @@ public class HexSphere
             // Get the centroid of the three adjacent tiles
             SCoord vert = SCoord.GetCentroid(tileCenter, neighborList[idx], neighborList[(idx + 1) % neighborList.Count]);
 
+            // Sort the coordinates in the correct order so the face is visible
             SCoord[] triangleCoords = SCoord.SortClockwiseOrder(tileCenter, 
                 neighborList[idx], 
                 neighborList[(idx + 1) % neighborList.Count]);
 
+            // Add the vertex
             vertices.Add(hexSphere.GetPoint(vert));
+            // Add the normal vector of the vertex
             normals.Add(vert.ToEuclidian());
+            // Add UV coordinate for this vertex
             Vector2 uv = new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f);
             uvLocations.Add(new Vector2(0.5f + Mathf.Cos(radPerVertex * idx) * 0.5f, 0.5f + Mathf.Sin(radPerVertex * idx) * 0.5f));
 
+            // Add the triangles (set of three vertices)
             triangleList.Add(keyLookup[triangleCoords[2]]);
             triangleList.Add(keyLookup[triangleCoords[1]]);
             triangleList.Add(keyLookup[triangleCoords[0]]);

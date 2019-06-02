@@ -3,53 +3,56 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Spherical Coordinate with a latitude and longitude around a sphere
+/// Spherical Coordinate with a thetaitude and phigitude around a sphere
 /// </summary>
 public class SCoord
 {
     /// <summary>
-    /// Coordinates in lattidue and longitude. Measured in radians.
+    /// Coordinates of theta and phi. Measured in radians.
     /// </summary>
-    private float lat, lon;
+    private float theta, phi;
 
     /// <summary>
     /// Creates a Sphereical Coordinate
     /// </summary>
-    /// <param name="lat">lattitude of the coordinate (in radians)</param>
-    /// <param name="lon">longitude of the coordinate (in radians)</param>
-    public SCoord(float lat, float lon)
+    /// <param name="theta">polar angle  of the coordinate (in radians)</param>
+    /// <param name="phi">azimuthal angle of the coordinate (in radians)</param>
+    public SCoord(float theta, float phi)
     {
-        this.lat = lat;
-        this.lon = lon;
+        this.theta = theta;
+        this.phi = phi;
 
     }
 
     /// <summary>
-    /// Get the lattitude of the coordinate.
+    /// Get the polar angle of the coordinate.
     /// </summary>
-    /// <returns>Longitude of the point as a float.</returns>
-    public float GetLat()
+    /// <returns>polar angle (theta) of the point as a float.</returns>
+    public float GetTheta()
     {
-        return lat;
+        return theta;
     }
 
     /// <summary>
-    /// Get the longitude of the coordinate.
+    /// Get the azimuthal angle of the coordinate.
     /// </summary>
-    /// <returns>Lattitude of the point as a float.</returns>
-    public float GetLon()
+    /// <returns>azimuthal angle (phi) of the point as a float.</returns>
+    public float GetPhi()
     {
-        return lon;
+        return phi;
     }
 
     /// <summary>
-    /// Gets a string representation of the lattitude and longitude of an icosphere.
+    /// Gets a string representation of the polar angle and azimuthal angle of an icosphere.
     /// </summary>
-    /// <returns>String of the lattitude and longitude of the point</returns>
+    /// <returns>String of the thetatitude and phigitude of the point</returns>
     public override string ToString()
     {
-        return "SCoord lat=" + (Mathf.Round(lat * 180 / Mathf.PI * 100) / 100).ToString() + 
-            " lon=" + (Mathf.Round(lon * 180 / Mathf.PI * 100) / 100).ToString().ToString();
+        float t = theta - Mathf.PI * 2 * (theta / Mathf.PI * 2);
+        float p = phi - Mathf.PI * 2 * (phi / Mathf.PI * 2);
+
+        return "SCoord theta=" + (Mathf.Round(t * 180 / Mathf.PI * 100) / 100).ToString() + 
+            " phi=" + (Mathf.Round(p * 180 / Mathf.PI * 100) / 100).ToString().ToString();
     }
 
     /// <summary>
@@ -64,7 +67,7 @@ public class SCoord
 
     /// <summary>
     /// Evaluates if two SCoordinates are equivalent. Two coordinate are equal if they have the 
-    /// same lattitude and longitude. 
+    /// same polar angle and azimuthal angle. 
     /// </summary>
     /// <param name="other">Other coordinate to compare to</param>
     /// <returns>True if they are the same, false otherwise.</returns>
@@ -73,13 +76,13 @@ public class SCoord
         if (this.GetType().IsAssignableFrom(other.GetType()))
         {
             SCoord otherCoord = (SCoord)other;
-            return otherCoord.lat == lat && otherCoord.lon == lon;
+            return otherCoord.theta == theta && otherCoord.phi == phi;
         }
         return false;
     }
 
     /// <summary>
-    /// Get the hash code of a SCoord. Generated using the lattitude and longitude of a point.
+    /// Get the hash code of a SCoord. Generated using the thetatitude and phigitude of a point.
     /// </summary>
     /// <returns>Arbitrary hash value for a given point. </returns>
     public override int GetHashCode()
@@ -88,8 +91,8 @@ public class SCoord
         {
             int hash = 683;
 
-            hash += 59 * lat.GetHashCode();
-            hash += 683 * lon.GetHashCode();
+            hash += 59 * theta.GetHashCode();
+            hash += 683 * phi.GetHashCode();
 
             return hash;
         }
@@ -105,19 +108,19 @@ public class SCoord
 
     public static float GetBearing(SCoord coord1, SCoord coord2)
     {
-        float y = Mathf.Sin(coord2.lon - coord1.lon) * Mathf.Cos(coord2.lat);
-        float x = Mathf.Cos(coord1.lat) * Mathf.Sin(coord2.lat) -
-                Mathf.Sin(coord1.lat) * Mathf.Cos(coord2.lat) * Mathf.Cos(coord2.lon - coord1.lon);
+        float y = Mathf.Sin(coord2.phi - coord1.phi) * Mathf.Cos(coord2.theta);
+        float x = Mathf.Cos(coord1.theta) * Mathf.Sin(coord2.theta) -
+                Mathf.Sin(coord1.theta) * Mathf.Cos(coord2.theta) * Mathf.Cos(coord2.phi - coord1.phi);
         return Mathf.Atan2(y, x);
     }
 
-    public static SCoord GetPointAlongBearing(SCoord start, float bearing, float angularDistance, float radius)
+    public static SCoord GetPointAphigBearing(SCoord start, float bearing, float angularDistance, float radius)
     {
-        float lat2 = Mathf.Asin(Mathf.Sin(start.lat) * Mathf.Cos(angularDistance / radius) +
-                    Mathf.Cos(start.lat) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(bearing));
-        float lon2 = start.lon + Mathf.Atan2(Mathf.Sin(bearing) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(start.lat),
-                                 Mathf.Cos(angularDistance / radius) - Mathf.Sin(start.lat) * Mathf.Sin(lat2));
-        return new SCoord(lat2, lon2);
+        float theta2 = Mathf.Asin(Mathf.Sin(start.theta) * Mathf.Cos(angularDistance / radius) +
+                    Mathf.Cos(start.theta) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(bearing));
+        float phi2 = start.phi + Mathf.Atan2(Mathf.Sin(bearing) * Mathf.Sin(angularDistance / radius) * Mathf.Cos(start.theta),
+                                 Mathf.Cos(angularDistance / radius) - Mathf.Sin(start.theta) * Mathf.Sin(theta2));
+        return new SCoord(theta2, phi2);
     }
 
     public static SCoord GetIntermediatePoint(SCoord coord1, SCoord coord2, float fraction)
@@ -130,9 +133,9 @@ public class SCoord
         float a = Mathf.Sin((1 - fraction) * delta) / Mathf.Sin(delta);
         float b = Mathf.Sin(fraction * delta) / Mathf.Sin(delta);
 
-        float x = a * Mathf.Cos(coord1.GetLat()) * Mathf.Cos(coord1.GetLon()) + b * Mathf.Cos(coord2.GetLat()) * Mathf.Cos(coord2.GetLon());
-        float y = a * Mathf.Cos(coord1.GetLat()) * Mathf.Sin(coord1.GetLon()) + b * Mathf.Cos(coord2.GetLat()) * Mathf.Sin(coord2.GetLon());
-        float z = a * Mathf.Sin(coord1.GetLat()) + b * Mathf.Sin(coord2.GetLat());
+        float x = a * Mathf.Cos(coord1.GetTheta()) * Mathf.Cos(coord1.GetPhi()) + b * Mathf.Cos(coord2.GetTheta()) * Mathf.Cos(coord2.GetPhi());
+        float y = a * Mathf.Cos(coord1.GetTheta()) * Mathf.Sin(coord1.GetPhi()) + b * Mathf.Cos(coord2.GetTheta()) * Mathf.Sin(coord2.GetPhi());
+        float z = a * Mathf.Sin(coord1.GetTheta()) + b * Mathf.Sin(coord2.GetTheta());
 
         return new SCoord(Mathf.Atan2(z, Mathf.Sqrt(x * x + y * y)), Mathf.Atan2(y, x));
     }
@@ -142,23 +145,23 @@ public class SCoord
     /// </summary>
     /// <param name="coord1">First coordinate</param>
     /// <param name="coord2">Second coordinate</param>
-    /// <returns>The point that lies between the two points along the great circle between them.</returns>
+    /// <returns>The point that lies between the two points aphig the great circle between them.</returns>
     public static SCoord GetMidpoint(SCoord coord1, SCoord coord2)
     {
-        float lat1 = coord1.lat;
-        float lon1 = coord1.lon;
-        float lat2 = coord2.lat;
-        float lon2 = coord2.lon;
+        float theta1 = coord1.theta;
+        float phi1 = coord1.phi;
+        float theta2 = coord2.theta;
+        float phi2 = coord2.phi;
 
-        float dLon = (lon2 - lon1 + Mathf.PI * 2) % (Mathf.PI * 2);
+        float dphi = (phi2 - phi1 + Mathf.PI * 2) % (Mathf.PI * 2);
 
 
-        float Bx = Mathf.Cos(lat2) * Mathf.Cos(dLon);
-        float By = Mathf.Cos(lat2) * Mathf.Sin(dLon);
-        float lat3 = Mathf.Atan2(Mathf.Sin(lat1) + Mathf.Sin(lat2), Mathf.Sqrt((Mathf.Cos(lat1) + Bx) * (Mathf.Cos(lat1) + Bx) + By * By));
-        float lon3 = lon1 + Mathf.Atan2(By, Mathf.Cos(lat1) + Bx);
+        float Bx = Mathf.Cos(theta2) * Mathf.Cos(dphi);
+        float By = Mathf.Cos(theta2) * Mathf.Sin(dphi);
+        float theta3 = Mathf.Atan2(Mathf.Sin(theta1) + Mathf.Sin(theta2), Mathf.Sqrt((Mathf.Cos(theta1) + Bx) * (Mathf.Cos(theta1) + Bx) + By * By));
+        float phi3 = phi1 + Mathf.Atan2(By, Mathf.Cos(theta1) + Bx);
 
-        return new SCoord(lat3, lon3);
+        return new SCoord(theta3, phi3);
     }
 
     /// <summary>
@@ -190,9 +193,9 @@ public class SCoord
     /// <returns>Vector3 that points in the direction from the center of the sphere with length 1</returns>
     public static Vector3 ConvertToEuclidian(SCoord coord)
     {
-        return new Vector3(Mathf.Cos(coord.lat) * Mathf.Cos(coord.lon),
-            Mathf.Sin(coord.lat),
-            Mathf.Cos(coord.lat) * Mathf.Sin(coord.lon));
+        return new Vector3(Mathf.Cos(coord.theta) * Mathf.Cos(coord.phi),
+            Mathf.Sin(coord.theta),
+            Mathf.Cos(coord.theta) * Mathf.Sin(coord.phi));
     }
 
     /// <summary>
@@ -204,12 +207,12 @@ public class SCoord
     {
         if (vector.x == 0)
             vector.x = Mathf.Epsilon;
-        float outLon = Mathf.Atan(vector.z / vector.x);
+        float outphi = Mathf.Atan(vector.z / vector.x);
         if (vector.x < 0)
-            outLon += Mathf.PI;
-        float outLat = Mathf.Asin(vector.y);
+            outphi += Mathf.PI;
+        float outtheta = Mathf.Asin(vector.y);
 
-        return new SCoord(outLat, outLon);
+        return new SCoord(outtheta, outphi);
     }
 
     /// <summary>
@@ -253,40 +256,40 @@ public class SCoord
 }
 
 /// <summary>
-/// Compare two SCoordinates sorting by lattitude then longitude.
+/// Compare two SCoordinates sorting by theta then phi.
 /// </summary>
-public class SCoordComparatorLat : IComparer<SCoord>
+public class SCoordComparatorTheta : IComparer<SCoord>
 {
     /// <summary>
-    /// Compares two coordinates. Uses lattitude before longitude. This is mostly
+    /// Compares two coordinates. Uses theta before phi. This is mostly
     /// and arbitrary but consistant sorting method.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns>
-    /// 1 if x's lattitude is greater than y's
-    /// -1 if x's lattitude is less than y's
-    /// if x's lattitude and y's lattitude are equal
-    /// 1 if x's longitude is greater than y's longitude
-    /// -1 if y's longitude is less than y's longitude
-    /// 0 if x's longitude equals y's longitude
+    /// 1 if x's theta is greater than y's
+    /// -1 if x's theta is less than y's
+    /// if x's theta and y's thetatitude are equal
+    /// 1 if x's phi is greater than y's phi
+    /// -1 if y's phi is less than y's phi
+    /// 0 if x's phi equals y's phi
     /// </returns>
     public int Compare(SCoord x, SCoord y)
     {
-        if (x.GetLat() > y.GetLat())
+        if (x.GetTheta() > y.GetTheta())
         {
             return 1;
         }
-        if (x.GetLat() < y.GetLat())
+        if (x.GetTheta() < y.GetTheta())
         {
             return -1;
         }
 
-        if (x.GetLon() > y.GetLon())
+        if (x.GetPhi() > y.GetPhi())
         {
             return 1;
         }
-        if (x.GetLon() < y.GetLon())
+        if (x.GetPhi() < y.GetPhi())
         {
             return -1;
         }
@@ -296,40 +299,40 @@ public class SCoordComparatorLat : IComparer<SCoord>
 }
 
 /// <summary>
-/// Compare two SCoordinates sorting by longitude then lattitude.
+/// Compare two SCoordinates sorting by phi then theta.
 /// </summary>
-public class SCoordComparatorLon : IComparer<SCoord>
+public class SCoordComparatorPhi : IComparer<SCoord>
 {
     /// <summary>
-    /// Compares two coordinates. Uses longitude before lattitude. This is mostly
+    /// Compares two coordinates. Uses phi before theta. This is mostly
     /// and arbitrary but consistant sorting method.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns>
-    /// 1 if x's longitude is greater than y's
-    /// -1 if x's longitude is less than y's
-    /// if x's longitude and y's longitude are equal
-    /// 1 if x's lattitude is greater than y's lattitude
-    /// -1 if y's lattitude is less than y's lattitude
-    /// 0 if x's lattitude equals y's lattitude
+    /// 1 if x's phi is greater than y's
+    /// -1 if x's phi is less than y's
+    /// if x's phi and y's phigitude are equal
+    /// 1 if x's theta is greater than y's thetatitude
+    /// -1 if y's theta is less than y's thetatitude
+    /// 0 if x's theta equals y's thetatitude
     /// </returns>
     public int Compare(SCoord x, SCoord y)
     {
-        if (x.GetLon() > y.GetLon())
+        if (x.GetPhi() > y.GetPhi())
         {
             return 1;
         }
-        if (x.GetLon() < y.GetLon())
+        if (x.GetPhi() < y.GetPhi())
         {
             return -1;
         }
 
-        if (x.GetLat() > y.GetLat())
+        if (x.GetTheta() > y.GetTheta())
         {
             return 1;
         }
-        if (x.GetLat() < y.GetLat())
+        if (x.GetTheta() < y.GetTheta())
         {
             return -1;
         }
