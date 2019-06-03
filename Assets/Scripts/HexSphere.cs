@@ -55,7 +55,7 @@ public class HexSphere
 
             // Move the tile to its new position and rotation
             newTile.transform.position += parentObject.transform.position;
-            newTile.transform.Rotate(parentObject.transform.eulerAngles + parentObject.transform.eulerAngles);
+            newTile.transform.Rotate(parentObject.transform.eulerAngles);
 
             // set hierarchy relationship
             newTile.transform.SetParent(parentObject);
