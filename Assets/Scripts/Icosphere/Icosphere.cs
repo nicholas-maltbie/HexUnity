@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Assets.Scripts.Graph;
 
 /// <summary>
 /// Icosphere that is made up of a set of equidistant veriticies that are
